@@ -1,11 +1,11 @@
 from mongoengine import Document, fields
+from datetime import datetime
 
 class User(Document):
     name = fields.StringField(required=True)
     email = fields.StringField(required=True)
-    birth_date = fields.DateTimeField()
     password = fields.StringField(require=True)
-    created_at = fields.DateTimeField()
+    created_at = fields.DateTimeField(default=datetime.now())
 
     def createArticle(**kwargs):
         return Article(**kwargs, likes = Like(user = [], counter = 0)).save()
@@ -19,7 +19,7 @@ class Article(Document):
     author = fields.EmbeddedDocumentField('User')
     likes = fields.EmbeddedDocumentField('Like')
     content = fields.IntField(required=True)
-    created_at = fields.DateTimeField()
+    created_at = fields.DateTimeField(default=datetime.now())
 
     def getLikesNumber():
         return likes.counter

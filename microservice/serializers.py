@@ -9,7 +9,7 @@ class ArticleInput(serializers.Serializer):
 
     def save(self):
         data = self.validated_data
-        article = models.Article()
+        article = models.Article(article)
         article.save()
         return ArticleOutput(article).data
 
@@ -21,15 +21,17 @@ class ArticleOutput(DocumentSerializer):
 
 
 class UserInput(serializers.Serializer):
-    a = serializers.CharField()
-    b = serializers.CharField()
-    c = serializers.IntegerField()
+    name = serializers.CharField()
+    email = serializers.CharField()
+    password = serializers.CharField()
 
     def save(self):
         data = self.validated_data
-        user = models.User()
-        user.save()
-        return UserOutput(user).data
+        if not models.User.objects(email = data['email']).all():
+            user = models.User(**data)
+            user.save()
+            return UserOutput(user).data
+        return {'message': 'User already exist'}
 
 
 class UserOutput(DocumentSerializer):
