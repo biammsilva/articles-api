@@ -1,6 +1,7 @@
 from rest_framework_mongoengine.serializers import serializers, DocumentSerializer
 from microservice import models
 from datetime import datetime
+import hashlib
 
 class ArticleInput(serializers.Serializer):
     a = serializers.CharField()
@@ -27,9 +28,11 @@ class UserInput(serializers.Serializer):
 
     def save(self):
         data = self.validated_data
+        passw = data.pop('password')
         if not models.User.objects(email = data['email']).all():
-            user = models.User(**data)
-            user.save()
+            user = models.User(**data,
+                               password = hashlib.sha224(passw.encode('utf-8')).hexdigest())\
+                               .save()
             return UserOutput(user).data
         return {'message': 'User already exist'}
 
