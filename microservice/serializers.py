@@ -4,23 +4,6 @@ from microservice import auth
 from datetime import datetime
 import hashlib
 
-class ArticleInput(serializers.Serializer):
-    title = serializers.CharField()
-    content = serializers.CharField()
-
-    def save(self):
-        data = self.validated_data
-        article = models.Article(article)
-        article.save()
-        return ArticleOutput(article).data
-
-
-class ArticleOutput(DocumentSerializer):
-    class Meta:
-        model = models.Article
-        fields = '__all__'
-
-
 class UserAuthInput(serializers.Serializer):
     email = serializers.CharField()
     password = serializers.CharField()
@@ -62,4 +45,32 @@ class UserInput(serializers.Serializer):
 class UserOutput(DocumentSerializer):
     class Meta:
         model = models.User
+        fields = '__all__'
+
+
+class LikeOutput(DocumentSerializer):
+    users = UserOutput(many=True)
+
+    class Meta:
+        model = models.Like
+        fields = '__all__'
+
+
+class ArticleInput(serializers.Serializer):
+    title = serializers.CharField()
+    content = serializers.CharField()
+
+    def save(self, user):
+        data = self.validated_data
+        a = ArticleOutput(user.createArticle(**data)).data
+        print(a)
+        return a, 200
+
+
+class ArticleOutput(serializers.Serializer):
+    likes = LikeOutput()
+    author = UserOutput()
+
+    class Meta:
+        model = models.Article
         fields = '__all__'

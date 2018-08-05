@@ -35,6 +35,17 @@ class ArticleView(BaseView):
     input_serializer = serializers.ArticleInput
     output_serializer = serializers.ArticleOutput
 
+    def create(self, request):
+        data = request.data
+        serializer = self.input_serializer(data=data)
+        if 'HTTP_AUTHORIZATION' in request.META:
+            if auth.authenticate_user(request.META["HTTP_AUTHORIZATION"]):
+                if serializer.is_valid():
+                    user_auth = models.UserAuth.objects(hash=request.META["HTTP_AUTHORIZATION"]).first()
+                    return Response(*serializer.save(user_auth.user))
+                return Response(serializer.errors, 500)
+        return Response({'message': "Authorization is required"}, 401)
+
 class UserView(BaseView):
     queryset = models.User.objects
     input_serializer = serializers.UserInput

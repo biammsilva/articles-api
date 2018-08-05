@@ -1,4 +1,5 @@
 from mongoengine import Document, fields
+from datetime import datetime
 
 class User(Document):
     name = fields.StringField(required=True)
@@ -7,17 +8,20 @@ class User(Document):
     created_at = fields.DateTimeField()
 
     def createArticle(self, **kwargs):
-        return Article(**kwargs, likes = Like(user = [], counter = 0)).save()
+        return Article(**kwargs,
+                       author=self,
+                       created_at=datetime.now(),
+                       likes = Like(users = [], counter = 0).save()).save()
 
 class Like(Document):
-    user = fields.ListField(fields.EmbeddedDocumentField('User'))
+    users = fields.ListField(fields.EmbeddedDocumentField('User'))
     counter = fields.IntField()
 
 class Article(Document):
     title = fields.StringField(required=True)
     author = fields.EmbeddedDocumentField('User')
     likes = fields.EmbeddedDocumentField('Like')
-    content = fields.IntField(required=True)
+    content = fields.StringField(required=True)
     created_at = fields.DateTimeField()
 
     def getLikesNumber(self):
