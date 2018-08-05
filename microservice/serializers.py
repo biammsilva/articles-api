@@ -66,8 +66,14 @@ class ArticleInput(serializers.Serializer):
         print(a)
         return a, 200
 
+class ArticleLikesInput(serializers.Serializer):
+    id = serializers.CharField()
+
 
 class ArticleOutput(serializers.Serializer):
+    id = serializers.CharField()
+    title = serializers.CharField()
+    content = serializers.CharField()
     likes = LikeOutput()
     author = UserOutput()
 

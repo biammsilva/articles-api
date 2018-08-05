@@ -11,7 +11,7 @@ class User(Document):
         return Article(**kwargs,
                        author=self,
                        created_at=datetime.now(),
-                       likes = Like(users = [], counter = 0).save()).save()
+                       likes = Like(users = [], counter = 0)).save()
 
 class Like(Document):
     users = fields.ListField(fields.EmbeddedDocumentField('User'))
@@ -24,8 +24,22 @@ class Article(Document):
     content = fields.StringField(required=True)
     created_at = fields.DateTimeField()
 
+    def like(self, user):
+        if user not in self.likes.users:
+            counter = self.likes.counter + 1
+            self.likes.users.append(user)
+        else:
+            counter = self.likes.counter - 1
+            self.likes.users.remove(user)
+        self.likes = Like(
+        users = self.likes.users,
+        counter = counter
+        )
+        self.save()
+        return user in self.likes.users
+
     def getLikesNumber(self):
-        return likes.counter
+        return self.likes.counter
 
 class UserAuth(Document):
     user = fields.EmbeddedDocumentField('User')

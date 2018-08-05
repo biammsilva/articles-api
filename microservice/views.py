@@ -25,7 +25,7 @@ class BaseView(viewsets.GenericViewSet):
         return Response(serializer.errors, 500)
 
     def list(self, request):
-        return Response(self.output_serializer(many=True).data, 200)
+        return Response(self.output_serializer(self.queryset.all(), many=True).data, 200)
 
     def retrieve(self, request, id=None):
         return Response(self.output_serializer(self.queryset(id=id).first()).data, 200)
@@ -61,7 +61,39 @@ class UserLogoutView(BaseView):
     input_serializer = 'None'
     output_serializer = 'None'
 
+    def create(self, request):
+        return Response({'message': 'Method not allowed'}, 400)
+
+    def retrieve(self, request):
+        return Response({'message': 'Method not allowed'}, 400)
+
     def list(self, request):
         if 'HTTP_AUTHORIZATION' in request.META:
             return Response({'logged_off': auth.logout(request.META['HTTP_AUTHORIZATION'])}, 200)
+        return Response({'message': "Authorization is required"}, 401)
+
+class ArticleLikeView(BaseView):
+    queryset = models.Article.objects
+    input_serializer = serializers.ArticleLikesInput
+    output_serializer = serializers.ArticleOutput
+
+    def create(self, request):
+        data = request.data
+        if 'HTTP_AUTHORIZATION' in request.META:
+            if auth.authenticate_user(request.META["HTTP_AUTHORIZATION"]):
+                user_auth = models.UserAuth.objects(hash=request.META["HTTP_AUTHORIZATION"]).first()
+                user = user_auth.user
+                article = self.queryset(id=data['id']).first()
+                return Response({'article': str(article.id), 'liked': article.like(user)})
+        return Response({'message': "Authorization is required"}, 401)
+
+    def list(self, request):
+        return Response(self.output_serializer(self.queryset.all(), many=True).data, 200)
+
+    def retrieve(self, request, id=None):
+        data = request.data
+        if 'HTTP_AUTHORIZATION' in request.META:
+            if auth.authenticate_user(request.META["HTTP_AUTHORIZATION"]):
+                article = self.queryset(id=id).first()
+                return Response({'likes': article.getLikesNumber()}, 200)
         return Response({'message': "Authorization is required"}, 401)

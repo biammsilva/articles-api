@@ -6,10 +6,10 @@ from microservice import views
 
 
 router = routers.DefaultRouter(trailing_slash=False)
-# router.register(r"article", views.ArticleView)
 router.register(r"user/auth", views.UserAuthView)
 router.register(r"user/logout", views.UserLogoutView)
 router.register(r"user/article", views.ArticleView)
+router.register(r"article/like", views.ArticleLikeView)
 router.register(r"user", views.UserView)
 
 urlpatterns = [
