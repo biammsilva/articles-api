@@ -6,7 +6,7 @@ class User(Document):
     password = fields.StringField(require=True)
     created_at = fields.DateTimeField()
 
-    def createArticle(**kwargs):
+    def createArticle(self, **kwargs):
         return Article(**kwargs, likes = Like(user = [], counter = 0)).save()
 
 class Like(Document):
@@ -20,5 +20,15 @@ class Article(Document):
     content = fields.IntField(required=True)
     created_at = fields.DateTimeField()
 
-    def getLikesNumber():
+    def getLikesNumber(self):
         return likes.counter
+
+class UserAuth(Document):
+    user = fields.EmbeddedDocumentField('User')
+    date = fields.DateTimeField()
+    logged_in = fields.IntField()
+    hash = fields.StringField(required=True)
+
+    def logout(self):
+        self.logged_in = 0
+        self.save()
