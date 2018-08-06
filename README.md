@@ -4,12 +4,12 @@
 
 __Em linux__: in the application path, type on terminal:
 ```
-sudo docker build -t test-stormtech .
+sudo docker build -t test .
 ```
 
 After the build:
 ```
-sudo docker run -p 8000:8000 test-stormtech
+sudo docker run -p 8000:8000 test
 ```
 
 Now, access the http://localhost:8000.
