@@ -108,3 +108,9 @@ __Get articles__
 GET http://localhost:8000/article/like
 header "Authorization": str
 ```
+
+__Logout__
+```
+GET http://localhost:8000/user/logout
+header "Authorization": str
+```
