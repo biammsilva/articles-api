@@ -1,37 +1,37 @@
-# Sorting Service
+# Articles API
 
-## Para rodar o projeto em um docker:
+## Run in a docker:
 
-__Em linux__: com o terminal aberto no diretório da aplicação digite:
+__Em linux__: in the application path, type on terminal:
 ```
 sudo docker build -t test-stormtech .
 ```
 
-Com o término do build digite:
+After the build:
 ```
 sudo docker run -p 8000:8000 test-stormtech
 ```
 
-Após isso é só acessar a porta 8000 de seu localhost.
+Now, access the http://localhost:8000.
 
-## Para rodar o projeto usando uma env em python:
-__pré-requisitos:__
-* Ter o Python3 instalado;
-* Ter o pip do python3 instalado;
+## Running in a python env:
+__requirements:__
+* Having Python3;
+* Having python3-pip installed;
 
-Caso você não tenha a virtualenv instalada, basta inserir no terminal:
+If you dont have a virtualenv, do:
 
 ```
 pip3 install virtualenv
 ```
 
-Abra o terminal na raiz do diretório e crie uma env:
+Open terminal in project main path and type:
 
 ```
 virtualenv -p python3 env
 ```
 
-Ative sua env:
+Activate your:
 
 __linux:__
 ```
@@ -43,45 +43,68 @@ __windows:__
 env\Scripts\activate
 ```
 
-Com sua env ativa, você deve instalar as dependências:
+Install dependencies with your env activated:
 ```
 pip install -r requirements.txt
 ```
 
-Agora o sistema está configurado para executar. Para executar no terminal:
+To execute, type:
 ```
 python manage.py runserver
 ```
+Using a virtual env you'll always have to activate it to run your application, this guarantee that you have all dependencies in your environment. Obs: Inside an environment you don't have to say what python version are you using as you started it with a base version.
 
-Neste caso você precisará sempre ativar a sua env para rodar a aplicação, pois nela conterá todas as dependências necessárias para sua execução. Com uma env você terá um ambiente para rodar sua aplicação sem instalar as bibliotecas de maneira solta em sua máquina. Obs: Dentro de uma env não é necessário dizer a versão do python que está sendo usada já que ela foi inicializada com uma versão base.
+## Endpoints
 
-## Endpoints da aplicação
-
-__Cadastrar um livro__
+__Create a User__
 ```
-POST http://localhost:8000/book
-```
-*Para visualizar o payload acesse: http://localhost:8000/docs*
-
-__Selecionar todos os livros__
-```
-GET http://localhost:8000/book
+POST http://localhost:8000/user
+{
+  'name': str,
+  'email': str,
+  'password': str
+}
 ```
 
-__Selecionar um livro__
+__Authenticate User__
 ```
-GET http://localhost:8000/book/{id}
+POST http://localhost:8000/user/auth
+{
+  'email': str,
+  'password': str
+}
+```
+it will return an authentication hash
+
+__Create a post__
+```
+POST http://localhost:8000/user/article
+header "Authorization": str
+{
+	"title": str,
+	"content": "str
+}
+```
+For authorization, use the returned hash
+
+__Like a post__
+```
+POST http://localhost:8000/user/article
+header "Authorization": str
+{
+	"id": str
+}
+```
+In id, put the article ID
+
+__Get likes number__
+```
+GET http://localhost:8000/article/like/<article_id>
+header "Authorization": str
 ```
 
-__Ordenar por propriedade do livro__
+__Get articles__
 ```
-GET http://localhost:8000/book?filter=title
-```
-*Filtro pode ser: title, author ou edition_year*
-
-## Executar testes
-
-Dentro da env:
-```
-python manage.py test
+GET http://localhost:8000/article/like
+header "Authorization": str
 ```
